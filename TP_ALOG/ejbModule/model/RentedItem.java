@@ -11,21 +11,23 @@ import java.util.Date;
  */
 @Entity
 @Table(name="renteditems")
-@NamedQuery(name="RentedItem.findAll", query="SELECT r FROM RentedItem r")
-public class RentedItem extends RentedItemExtention implements Serializable {
+@NamedQuery(name="Renteditem.findAll", query="SELECT r FROM Renteditem r")
+public class Renteditem extends RentedItemM implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	private int rentID;
 
+	@Column(name="customerID")
 	private int customerID;
 
 	@Temporal(TemporalType.DATE)
 	private Date dueDate;
 
+	@Column(name="ItemID")
 	private int itemID;
 
-	public RentedItem() {
+	public Renteditem() {
 	}
 
 	public int getRentID() {

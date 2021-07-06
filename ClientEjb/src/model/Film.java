@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 
 @Entity 
 @DiscriminatorValue("2")
-public class Film extends StockItem {
+public class Film extends Stockitem {
 	private static final long serialVersionUID = 1L;
 
     private String acteur;

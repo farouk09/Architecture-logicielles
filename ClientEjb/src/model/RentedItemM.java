@@ -1,9 +1,9 @@
 package model;
 
-public class RentedItemExtention {
+public class RentedItemM {
 	
-	private Client client = null;
-	private StockItem item = null;
+	private Client client ;
+	private Stockitem item;
 	
 	public Client getCustomer() {
 		return client;
@@ -13,11 +13,11 @@ public class RentedItemExtention {
 		this.client = client;
 	}
 
-	public StockItem getItem() {
+	public Stockitem getItem() {
 		return item;
 	}
 	
-	public void setItem(StockItem item) {
+	public void setItem(Stockitem item) {
 		this.item = item;
 	}
 

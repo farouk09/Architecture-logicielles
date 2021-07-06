@@ -1,20 +1,20 @@
 package session;
 
 import java.util.ArrayList;
+import model.*;
 import java.util.Date;
 import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+
+import javax.persistence.PersistenceContext;
 
 import model.Client;
-import model.Film;
 import model.Jeux;
-import model.RentedItem;
-import model.StockItem;
+
+import model.Renteditem;
 
 /**
  * Session Bean implementation class DaoDatabase
@@ -26,13 +26,14 @@ public class DaoDatabase implements DaoDatabaseRemote {
     /**
      * Default constructor. 
      */
-    public DaoDatabase() {
-		this.emf = Persistence.createEntityManagerFactory("TP_ALOG");
-	    this.em = emf.createEntityManager();
-    }
-    
-	EntityManagerFactory emf;
-	EntityManager em;
+
+
+	public DaoDatabase() {
+	
+	}
+	
+	   @PersistenceContext(unitName="TP_ALOG")
+		EntityManager em;
 
 
 	@Override
@@ -44,18 +45,39 @@ public class DaoDatabase implements DaoDatabaseRemote {
 			return null;
 		}
 	}
+	
+	@Override
+	public Client getClientID(int id) {
+		try {
+			Client client = (Client) em.createQuery("select c from Client c where c.customerID = :id").setParameter("id", id).getSingleResult();
+			return client;
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	
+	@Override
+	public Stockitem getItemID(int id) {
+		try {
+			Stockitem item = (Stockitem) em.createQuery("select s from Stockitem s where s.itemID = :id").setParameter("id", id).getSingleResult();	
+			
+			return item;
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<RentedItem> getRentedItems() {
+	public List<Renteditem> getRentedItems() {
 		Client client;
-		StockItem stockItem;
-		List<RentedItem> rentedItems = new ArrayList<RentedItem>();
+		Stockitem stockItem;
+		List<Renteditem> rentedItems = new ArrayList<Renteditem>();
 		try {
-			rentedItems = em.createQuery("select r from RentedItem r").getResultList();
-			for (RentedItem item: rentedItems) {
-				client = (Client) em.createQuery("select c from Client c where c.customerID = :idClient").setParameter("idClient", item.getCustomerID()).getSingleResult();
-				stockItem = (StockItem) em.createQuery("select s from StockItem s where s.itemID = :idItem").setParameter("idItem", item.getItemID()).getSingleResult();
+			rentedItems = em.createQuery("select r from Renteditem r").getResultList();
+			for (Renteditem item: rentedItems) {
+				client = getClientID(item.getCustomerID());
+				stockItem = getItemID(item.getItemID());
 				item.setCustomer(client);
 				item.setItem(stockItem);
 			}
@@ -66,10 +88,10 @@ public class DaoDatabase implements DaoDatabaseRemote {
 	}
 
 	@Override
-	public RentedItem getRentedItem(String title) {
-		StockItem item = (StockItem) em.createQuery("select s from StockItem s where s.title like :title").setParameter("title", "%"+title+"%").getSingleResult();
+	public Renteditem getRentedItem(String title) {
+		Stockitem item = (Stockitem) em.createQuery("select s from Stockitem s where s.title like :title").setParameter("title", "%"+title+"%").getSingleResult();
 		try {
-			RentedItem rentedItem = (RentedItem) em.createQuery("select r from RentedItem r where r.itemID = :id").setParameter("id", item.getItemID()).getSingleResult();
+			Renteditem rentedItem = (Renteditem) em.createQuery("select r from Renteditem r where r.itemID = :id").setParameter("id", item.getItemID()).getSingleResult();
 			Client client = (Client) em.createQuery("select c from Client c where c.customerID = :idClient").setParameter("idClient", rentedItem.getCustomerID()).getSingleResult();
 			rentedItem.setCustomer(client);
 			rentedItem.setItem(item);
@@ -80,9 +102,9 @@ public class DaoDatabase implements DaoDatabaseRemote {
 	}
 
 	@Override
-	public StockItem getStockItem(String articleTitle) {
+	public Stockitem getStockItem(String articleTitle) {
 		try {
-			StockItem item = (StockItem) em.createQuery("select s from StockItem s where s.title like :articleTitle").setParameter("articleTitle", "%"+articleTitle+"%").getSingleResult();
+			Stockitem item = (Stockitem) em.createQuery("select s from Stockitem s where s.title like :articleTitle").setParameter("articleTitle", "%"+articleTitle+"%").getSingleResult();
 			return item;
 		} catch (Exception e) {
 			return null;
@@ -91,10 +113,10 @@ public class DaoDatabase implements DaoDatabaseRemote {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<StockItem> getStockItems() { //Vérifier cas liste vide
-		List<StockItem> stockItems = new ArrayList<StockItem>();
+	public List<Stockitem> getStockItems() { 
+		List<Stockitem> stockItems = new ArrayList<Stockitem>();
 		try {
-			stockItems = em.createQuery("select s from StockItem s").getResultList();
+			stockItems = em.createQuery("select s from Stockitem s").getResultList();
 			return stockItems;
 		} catch (Exception e) {
 			return stockItems;
@@ -103,53 +125,46 @@ public class DaoDatabase implements DaoDatabaseRemote {
 
 	@Override
 	public void addRentedItem(int customerID, int itemID, Date dueDate) {
-		em.getTransaction().begin();
-		RentedItem rentedItem = new RentedItem();
+		Renteditem rentedItem = new Renteditem();
 		rentedItem.setCustomerID(customerID);
 		rentedItem.setItemID(itemID);
 		rentedItem.setDueDate(dueDate);
 		em.persist(rentedItem);
 		em.flush();
 	    em.clear();
-		em.getTransaction().commit();
 	}
 	
 	@Override
 	public void setClientSolde(Client client, double solde) {
-		em.getTransaction().begin();
 		Client c = em.find(Client.class, client.getCustomerID());
 		c.setAccountBalance(solde);
 		em.persist(c);
 		em.flush();
 	    em.clear();
-		em.getTransaction().commit();
 	}
 
 	@Override
-	public void removeRentedItem(RentedItem item) {
-		em.getTransaction().begin();
-		RentedItem i = em.find(RentedItem.class, item.getRentID());
+	public void removeRentedItem(Renteditem item) {
+		Renteditem i = em.find(Renteditem.class, item.getRentID());
 		em.remove(i);
 		em.flush();
 	    em.clear();
-		em.getTransaction().commit();
 	}
 
 	@Override
 	public void addClient(double accountBalance, String name) {
-		em.getTransaction().begin();
 		Client client = new Client();
 		client.setAccountBalance(accountBalance);
 		client.setName(name);
+		
 		em.persist(client);
 		em.flush();
-	    em.clear();
-		em.getTransaction().commit();
+		em.clear();
+
 	}
 
 	@Override
 	public void addGame(double rentalPrice, String title, String plateforme) {
-		em.getTransaction().begin();
 		Jeux jeu = new Jeux();
 		jeu.setPlateforme(plateforme);
 		jeu.setTitle(title);
@@ -157,12 +172,10 @@ public class DaoDatabase implements DaoDatabaseRemote {
 		em.persist(jeu);
 		em.flush();
 	    em.clear();
-		em.getTransaction().commit();
 	}
 
 	@Override
 	public void addFilm(double rentalPrice, String title, String acteur) {
-		em.getTransaction().begin();
 		Film film = new Film();
 		film.setActeur(acteur);
 		film.setTitle(title);
@@ -170,8 +183,9 @@ public class DaoDatabase implements DaoDatabaseRemote {
 		em.persist(film);
 		em.flush();
 	    em.clear();
-		em.getTransaction().commit();
 	}
+
+	
 
 
 	

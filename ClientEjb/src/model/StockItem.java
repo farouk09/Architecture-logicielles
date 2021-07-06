@@ -12,12 +12,13 @@ import javax.persistence.*;
 @Table(name="stockitems")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="type", discriminatorType = DiscriminatorType.INTEGER)
-@DiscriminatorValue("0")  
-@NamedQuery(name="StockItem.findAll", query="SELECT s FROM StockItem s")
-public class StockItem implements Serializable {
+@DiscriminatorValue("0") 
+@NamedQuery(name="Stockitem.findAll", query="SELECT s FROM Stockitem s")
+public class Stockitem implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Column(name="itemID")
 	private int itemID;
 
 	private String acteur;
@@ -28,9 +29,10 @@ public class StockItem implements Serializable {
 
 	private String title;
 
+	@Column(name="type")
 	private int type;
 
-	public StockItem() {
+	public Stockitem() {
 	}
 
 	public int getItemID() {
@@ -61,8 +63,8 @@ public class StockItem implements Serializable {
 		return this.rentalPrice;
 	}
 
-	public void setRentalPrice(double rentalPrice2) {
-		this.rentalPrice = rentalPrice2;
+	public void setRentalPrice(double rentalPrice) {
+		this.rentalPrice = rentalPrice;
 	}
 
 	public String getTitle() {

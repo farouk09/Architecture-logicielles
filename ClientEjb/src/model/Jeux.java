@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 
 @Entity 
 @DiscriminatorValue("1")
-public class Jeux extends StockItem {
+public class Jeux extends Stockitem {
 	private static final long serialVersionUID = 1L;
 
     private String plateforme;
