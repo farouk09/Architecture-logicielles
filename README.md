@@ -1,6 +1,10 @@
 # Architecture-logicielles
 Manipuler les concepts de bases préliminaires des architecture logicielles : Architecture en couches, ClientEjb, JPA           
-C'est une application programmée en JAVA pour une vidéothèque (magasin de vente de films, jeux...) implémentée avec une architecture Pipe & Filter. Les filtres sont les classes : GUI (JavaFX), QueryProcessor et TransactionProcessor (GUI | QueryProcessor | TransactionProcessor | GUI... cyclique). Le pipe est implémenté par le biais d'une file de chaines de caractères pour stocker les messages entre filtres et notifier le prochain pour faire son traitement.
+
+C'est une application programmée en JAVA pour une vidéothèque (magasin de vente de films, jeux...) implémentée en :
+- Architecture Pipe & Filter. Les filtres sont les classes : GUI (JavaFX), QueryProcessor et TransactionProcessor (GUI | QueryProcessor | TransactionProcessor | GUI... cyclique). Le pipe est implémenté par le biais d'une file de chaines de caractères pour stocker les messages entre filtres et notifier le prochain pour faire son traitement.
+
+- Architecture en quatre couches, à savoir : la couche présentation (IHM) avec JavaFX, couche métier, couche accès aux données (DAO) et couche base de données avec MySQL et serveur Apache.
 
 les fonctionnalités de l'application :
 
